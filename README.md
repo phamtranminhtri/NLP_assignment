@@ -7,5 +7,5 @@
 
 ## Repository structure
 
-* `report/`: Contains LaTeX source and report pdf.
+* `report/`: Contains LaTeX source and report pdf. Report pdf is at [`report/main_en.pdf`](report/main_en.pdf)
 * `source/`: Contains the implementation source code for the assignment project.
