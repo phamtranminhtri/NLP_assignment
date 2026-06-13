@@ -8,7 +8,7 @@ In many online question forum, such as Quora, StackOverflow, or Reddit, where pe
     \centering
     \includegraphics[width=\linewidth]{image/macbook.png}
     \caption{Quora related questions}
-    \label{fig:enter-label}
+    \label{fig:quora}
 \end{figure}
 
 This is a problem of `Semantic similarity', in this case it's specifically `duplicate question detection'. We are trying to determine whether 2 question has the same, or close enough, sematic meaning. In the scope of this project, we will work with the dataset `Quora question pairs', with each sample containing 2 questions and a label telling whether those 2 are duplicated or not.
@@ -19,3 +19,87 @@ Historically, processing natural language has always been a complex and tedious 
 
 First, we need to understand the dataset we are about to work with.
 
+We download the dataset from Kaggle, then use Python library \texttt{pandas} to load the csv file to memory.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{c c c p{4.5cm} p{4.5cm} c}
+\hline
+ID & QID1 & QID2 & Question 1 & Question 2 & Duplicate \\
+\hline
+0 & 1 & 2 &
+What is the step by step guide to invest in share market in India? &
+What is the step by step guide to invest in share market? &
+0 \\
+
+1 & 3 & 4 &
+What is the story of Kohinoor (Koh-i-Noor) Diamond? &
+What would happen if the Indian government stole the Kohinoor (Koh-i-Noor) diamond back? &
+0 \\
+
+2 & 5 & 6 &
+How can I increase the speed of my internet connection while using a VPN? &
+How can Internet speed be increased by hacking through DNS? &
+0 \\
+
+3 & 7 & 8 &
+Why am I mentally very lonely? How can I solve it? &
+Find the remainder when $23^{24}$ is divided by 24,23? &
+0 \\
+
+4 & 9 & 10 &
+Which one dissolve in water quickly: sugar, salt, methane and carbon dioxide? &
+Which fish would survive in salt water? &
+0 \\
+
+5 & 11 & 12 &
+Astrology: I am a Capricorn Sun, Cap moon and Cap rising... what does that say about me? &
+I'm a triple Capricorn (Sun, Moon and ascendant in Capricorn). What does this say about me? &
+1 \\
+
+6 & 13 & 14 &
+Should I buy Tiago? &
+What keeps children active and far from phone and video games? &
+0 \\
+
+7 & 15 & 16 &
+How can I be a good geologist? &
+What should I do to be a great geologist? &
+1 \\
+
+8 & 17 & 18 &
+When do you use I instead of l? &
+When do you use "\&" instead of "and"? &
+0 \\
+
+9 & 19 & 20 &
+Motorola (company): Can I hack my Charter Motorola DCX3400? &
+How do I hack Motorola DCX3400 for free internet? &
+0 \\
+\hline
+\end{tabular}
+\caption{Sample records from the Quora Question Pairs dataset.}
+\label{tab:quora-sample}
+\end{table}
+
+We try printing the first 10 rows from the dataset, shown in table \ref{tab:quora-sample}. The important bits are the text of question 1, question 2, and the label indicating whether they are duplicated. Two sentence may look similar but can mean entirely different things.
+
+After that, we clean the null values from the table, and display some information about the table. We see the dataset has 404348 samples, with 149306 positive and 255042 negative samples. This mean the dataset is quite imbalance, hence during evaluation we will use metrics like precision, recall, f1 score, together with accuracy.
+
+We also do some basic plotting, with the histogram of character counts and words count, plus the word cloud showing the most appearing words in our dataset. 
+
+
+\begin{figure}[!h]
+    \includegraphics[width=.5\linewidth]{image/hist_char.png}
+    \includegraphics[width=.5\linewidth]{image/hist_word.png}
+    \caption{Histograms}
+    \label{fig:hist_word}
+\end{figure}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=.75\linewidth]{image/wordcloud.png}
+    \caption{Word cloud}
+    \label{fig:wordcloud}
+\end{figure}
