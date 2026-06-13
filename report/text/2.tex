@@ -2,4 +2,20 @@
 
 \subsection{Problem description}
 
+In many online question forum, such as Quora, StackOverflow, or Reddit, where people post a question and other people post their answer, it's common that it's a question that has been asked before with different wordings. For example, `What is Segmentation fault?' is the same as `Can somebody please explain to me what segfault is?? I keep getting this error.' It would be helpful to show the asker the answers in the similar post, to not waste time trying to answer the same question over and over again. 
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\linewidth]{image/macbook.png}
+    \caption{Quora related questions}
+    \label{fig:enter-label}
+\end{figure}
+
+This is a problem of `Semantic similarity', in this case it's specifically `duplicate question detection'. We are trying to determine whether 2 question has the same, or close enough, sematic meaning. In the scope of this project, we will work with the dataset `Quora question pairs', with each sample containing 2 questions and a label telling whether those 2 are duplicated or not.
+
+Historically, processing natural language has always been a complex and tedious task with countless rules and contraints, as languages are always evolving and new words, phrases, meaning keep changing over time, so much that ordinary grammar rules struggle to keep up with. In recent years, thanks to the development of computing and modern deep learning architecture, especially Transformer, the approach to these problem has been more friendly, as we move into extracting embedding vector to represent the meaning of natural language. In this project, we will be looking at the 2 commonly used model for this task, which is BERT and SBERT.  
+
 \subsection{Dataset EDA}
+
+First, we need to understand the dataset we are about to work with.
+
