@@ -91,7 +91,7 @@ MAX_EPOCHS = 3
 PATIENCE = 10
 \end{lstlisting}
 
-The configs for SBERT is quite similar to BERT, with the
+The configs for SBERT is quite similar to BERT, with the main difference being the hidden size, which is 384 instead of 768. We are using the most downloaded SBERT model from Hugging Face, and it's a tiny version, way smaller than BERT.
 
 Preparing the dataset differ somewhat to the BERT pipeline. This is because we are inputting 2 sentences seperately instead of combining them like previously.
 
@@ -185,3 +185,4 @@ class SbertQuoraModel(L.LightningModule):
         return logits
 \end{lstlisting}
 
+The differences to BERT is that we use a mean pooling layer to get the embedding, and we encode the 2 sentences seperately.
