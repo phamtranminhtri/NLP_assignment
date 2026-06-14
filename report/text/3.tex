@@ -1,5 +1,83 @@
 \section{Literature review}
 
+Before we dive into the problem, let's review the 2 important paper that explain how the 2 models we will be using work: BERT and SBERT.
+
 \subsection{BERT}
+
+BERT (Bidirectional Encoder Representations from Transformers) was introduced in the paper ``BERT: Pre-training of Deep Bidirectional Transformers for
+Language Understanding'' by Devlin et al at Google AI Language in 2019. Unlike other language models, like the original ``Attention is all you need'' paper (encoder-decoder) or GPT (decoder only), BERT has encoder only architecture, and it was pretrained without future masking, allowing information to flow in 2 direction, left to right and right to left, making the model able to represent better the whole sequence. The pretrained model is then finetuned for various downstream tasks.
+
+There are 2 step in BERT framework: pre-training and fine-tuning. The model is first pretrained on unlabeled data. The fine-tuning step take the pre-trained BERT model and train the parameters with their respective labeled data.
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\linewidth]{image/bert_train.png}
+    \caption{BERT training}
+    \label{fig:bert_train}
+\end{figure}
+
+BERT's architecture is a multiple transformer encoder layer, with 2 model sizes, BASE (768d hidden size, 110M params) and LARGE (1024d hidden size, 340M params). BERT allow the input to be either a single sentence or a pair of sentence (question-answer, next sentence, etc.). It use WordPiece embedding with vocab size of 30000. The first token is always \texttt{CLS} for classification tasks. If the input is a pair of sentences, there will be a \texttt{SEP} token between them.
+
+BERT was pre-trained on BooksCorpus (800M words) and English Wikipedia (2500M words), with 2 tasks: Masked Language Modeling (MLM) and Next Sentence Prediction (NSP).
+
+\begin{itemize}
+    \item In MLM, random token are masked and the model has to predict them. Because we are predicting the \texttt{MASK} token instead of the next token (like GPT), we can allow  attention to flow to both past and future token, allowing bidirectional information
+    \item In NSP, we choose a pair of sentences and have the model predict whether sentence B is the next sentence of sentence A in the corpus. This task help the model understand relationship between sentences and improve downstream task, like Question Answering (QA) and Natural Language Inference (NLI)
+\end{itemize}
+
+For fine-tuning, BERT was trained end-to-end from the pre-trained parameters with the tasks' input and output. At the time it achieved SOTA on 11 tasks:
+
+\begin{itemize}
+    \item {General Language Understanding Evaluation (GLUE):} 
+    \begin{itemize}
+        \item MultiNLI Matched/Mismatched (MNLI-(m/mm))
+        \item \textbf{Quora Question Pairs (QQP)}
+        \item Question NLI (QNLI)
+        \item The Stanford Sentiment Treebank (SST-2)
+        \item The Corpus of Linguistic Acceptability (CoLA)
+        \item Semantic Textual Similarity Benchmark (STS-B)
+        \item Microsoft Research Paraphrase Corpus (MRPC)
+        \item Recognizing Textual Entailment (RTE)
+    \end{itemize}
+    \item The Stanford Question Answering Dataset (SQuAD)
+    \begin{itemize}
+        \item SQuAD  v1.1
+        \item SQuAD v2.0
+    \end{itemize}
+    \item The Situations With Adversarial Generations (SWAG) 
+\end{itemize}
+
+\begin{table}[ht]
+\footnotesize
+\centering
+\label{tab:glue-results}
+\begin{tabular}{lccccccccc}
+\hline
+\textbf{System} &
+\begin{tabular}[c]{@{}c@{}}MNLI-(m/mm)\\392k\end{tabular} &
+\begin{tabular}[c]{@{}c@{}}\textbf{QQP}\\363k\end{tabular} &
+\begin{tabular}[c]{@{}c@{}}QNLI\\108k\end{tabular} &
+\begin{tabular}[c]{@{}c@{}}SST-2\\67k\end{tabular} &
+\begin{tabular}[c]{@{}c@{}}CoLA\\8.5k\end{tabular} &
+\begin{tabular}[c]{@{}c@{}}STS-B\\5.7k\end{tabular} &
+\begin{tabular}[c]{@{}c@{}}MRPC\\3.5k\end{tabular} &
+\begin{tabular}[c]{@{}c@{}}RTE\\2.5k\end{tabular} &
+\begin{tabular}[c]{@{}c@{}}Average\\-\end{tabular} \\
+\hline
+Pre-OpenAI SOTA & 80.6/80.1 & 66.1 & 82.3 & 93.2 & 35.0 & 81.0 & 86.0 & 61.7 & 74.0 \\
+BiLSTM+ELMo+Attn & 76.4/76.1 & 64.8 & 79.8 & 90.4 & 36.0 & 73.3 & 84.9 & 56.8 & 71.0 \\
+OpenAI GPT & 82.1/81.4 & 70.3 & 87.4 & 91.3 & 45.4 & 80.0 & 82.3 & 56.0 & 75.1 \\
+\hline
+BERT$_{\text{BASE}}$ & 84.6/83.4 & \textbf{71.2} & 90.5 & 93.5 & 52.1 & 85.8 & 88.9 & 66.4 & 79.6 \\
+BERT$_{\text{LARGE}}$ & {86.7/85.9} & {72.1} & {92.7} &
+{94.9} & {60.5} & {86.5} &
+{89.3} & {70.1} & {82.1} \\
+\hline
+\end{tabular}
+\caption{GLUE results}
+\end{table}
+
+Here we focus on QQR, as this will be the dataset we are working with in this project.
+
 
 \subsection{SBERT}
