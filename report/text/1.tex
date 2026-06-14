@@ -1,40 +1,19 @@
 \section{Introduction}
 
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[width=0.5\linewidth]{image/hcmut.png}
-%     \caption{Red-black tree}
-%     \label{fig:enter-label}
-% \end{figure}
+Historically, processing natural language has always been a complex and tedious task with countless rules and constraints, but modern deep learning architectures, especially Transformers, have made the approach much more friendly by using embedding vectors to represent the meaning of text. A practical application of this advancement is "semantic similarity", specifically the task of duplicate question detection. In many online question forums, users often post questions that have already been asked before with different wordings. It is highly beneficial to identify these variations and show askers similar posts, so people do not waste time answering the same question over and over again.
 
-% \begin{lstlisting}[language=Python, caption=Python example]
-% import numpy as np
-    
-% def incmatrix(genl1,genl2):
-%     m = len(genl1)
-%     n = len(genl2)
-%     M = None #to become the incidence matrix
-%     VT = np.zeros((n*m,1), int)  #dummy variable
-    
-%     #compute the bitwise xor matrix
-%     M1 = bitxormatrix(genl1)
-%     M2 = np.triu(bitxormatrix(genl2),1) 
+In the scope of this project, we will focus on determining whether two questions share the same, or a close enough, semantic meaning. We will work with the "Quora Question Pairs" dataset, evaluating samples that contain two questions alongside a binary label indicating whether they are duplicated or not. To tackle this classification task, we will look at two popular models: BERT and SBERT.
 
-%     for i in range(m-1):
-%         for j in range(i+1, m):
-%             [r,c] = np.where(M2 == M1[i,j])
-%             for k in range(len(r)):
-%                 VT[(i)*n + r[k]] = 1;
-%                 VT[(i)*n + c[k]] = 1;
-%                 VT[(j)*n + r[k]] = 1;
-%                 VT[(j)*n + c[k]] = 1;
-                
-%                 if M is None:
-%                     M = np.copy(VT)
-%                 else:
-%                     M = np.concatenate((M, VT), 1)
-                
-%                 VT = np.zeros((n*m,1), int)
-    
-%     return M
-% \end{lstlisting}
+This report will be structured as follows:
+
+\begin{itemize}
+    \item We will first review the literature and architecture behind the BERT and SBERT models.
+
+
+    \item Next, we will discuss our training configuration and approaches using PyTorch Lightning.
+
+
+    \item Finally, we will compare the results of our experiments, analyzing both the classification metrics (such as accuracy, precision, and F1-score) and the inference times to understand the trade-offs between the models.
+\end{itemize}
+
+The source code and \LaTeX for this project can be access via \url{https://github.com/phamtranminhtri/NLP_assignment}
