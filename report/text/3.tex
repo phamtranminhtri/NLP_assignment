@@ -5,7 +5,7 @@ Before we dive into the problem, let's review the 2 important paper that explain
 \subsection{BERT}
 
 BERT (Bidirectional Encoder Representations from Transformers) was introduced in the paper ``BERT: Pre-training of Deep Bidirectional Transformers for
-Language Understanding'' by Devlin et al at Google AI Language in 2019. Unlike other language models, like the original ``Attention is all you need'' paper (encoder-decoder) or GPT (decoder only), BERT has encoder only architecture, and it was pretrained without future masking, allowing information to flow in 2 direction, left to right and right to left, making the model able to represent better the whole sequence. The pretrained model is then finetuned for various downstream tasks.
+Language Understanding'' \cite{devlin2018bert} by Devlin et al at Google AI Language in 2019. Unlike other language models, like the original ``Attention is all you need'' paper (encoder-decoder) or GPT (decoder only), BERT has encoder only architecture, and it was pretrained without future masking, allowing information to flow in 2 direction, left to right and right to left, making the model able to represent better the whole sequence. The pretrained model is then finetuned for various downstream tasks.
 
 There are 2 step in BERT framework: pre-training and fine-tuning. The model is first pretrained on unlabeled data. The fine-tuning step take the pre-trained BERT model and train the parameters with their respective labeled data.
 
@@ -28,7 +28,7 @@ BERT was pre-trained on BooksCorpus (800M words) and English Wikipedia (2500M wo
 For fine-tuning, BERT was trained end-to-end from the pre-trained parameters with the tasks' input and output. At the time it achieved SOTA on 11 tasks:
 
 \begin{itemize}
-    \item {General Language Understanding Evaluation (GLUE):}
+    \item {General Language Understanding Evaluation (GLUE) \cite{glue-benchmark}:}
           \begin{itemize}
               \item MultiNLI Matched/Mismatched (MNLI-(m/mm))
               \item \textbf{Quora Question Pairs (QQP)}
@@ -85,7 +85,7 @@ Here we focus on QQR, as this will be the dataset we are working with in this pr
 BERT is a powerful model for multiple downstream task. But  when it come to semantic textual similarity, specifically finding similarity between 2 sentences, it require feeding both sentences into the network pairwise. Which mean, given $n$ sentences, we need to calculate $\frac{n(n-1)}{2}$ combination of sentence pair to get the similarity between each pair, which is inefficient. Another method is to get embedding of each sentence individually, to compute the similarity between the embedding vectors. It's common to use the last hidden state to represent the sentence, such as the \texttt{CLS} token, or the average pool of the embeddings.
 SBERT paper argues that this approad yeild worse embedding result than other existing approachs, like GLoVe.
 
-SBERT (Sentence-BERT) was introduced in the paper ``Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks'' by Nils Reimers et al in 2019. SBERT addressed the mentioned issues by taking BERT and training it on their specific task suitable for encoding the sentence for sementic similarity and clustering tasks.
+SBERT (Sentence-BERT) was introduced in the paper ``Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks'' \cite{reimers2019sentencebert} by Nils Reimers et al in 2019. SBERT addressed the mentioned issues by taking BERT and training it on their specific task suitable for encoding the sentence for sementic similarity and clustering tasks.
 
 \begin{figure}[!h]
     \centering

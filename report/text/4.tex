@@ -11,7 +11,7 @@ Considering the binary classification task with dataset `Quora Question Pairs', 
     \end{enumerate}
 \end{itemize}
 
-The training notebooks was ran on Google Colab. Each notebook ran for about 1-2 hours on T4 free tier GPU (16GB VRAM). The code use PyTorch and PyTorch Lightning for logic.
+The training notebooks was ran on Google Colab. Each notebook ran for about 1-2 hours on T4 free tier GPU (16GB VRAM). The code use PyTorch and PyTorch Lightning for logic, which let us configure many training options easily, such as logging, early stopping, optimizer, training step, etc.
 
 
 \subsection{BERT}
@@ -30,7 +30,7 @@ MAX_EPOCHS = 3
 PATIENCE = 10
 \end{lstlisting}
 
-We load the model and dataset from Hugging Face's libraries \texttt{transformers} and \texttt{datasets}. To stay true to the original BERT paper, we will use \texttt{google-bert/bert-base-uncased} (although TinyBERT would be lighter for small GPU). As recommeded by BERT paper, we will choose learning rate $3\times 10^{-5}$.
+We load the model and dataset from Hugging Face's libraries \texttt{transformers} and \texttt{datasets}. To stay true to the original BERT paper, we will use \texttt{google-bert/bert-base-uncased} \cite{bert-base-uncased} (although TinyBERT would be lighter for small GPU). As recommeded by BERT paper, we will choose learning rate $3\times 10^{-5}$.
 
 We clean the invalid data from our dataset, then tokenize them into token ids. These ids will be used as input for the model. It's important to use the correct tokenizer for the model. We also make sure to truncate during tokenization, else it might not fit into BERT's max sequence length.
 
@@ -47,7 +47,7 @@ ds_tokenized = ds_cleaned.map(
 
 After that, we split the data to train, validation, and test sets. The final processing step is collating data. We use the available \texttt{DataCollatorWithPadding} to pad each sample to the longest sample of the batch for each mini batch, because pytorch tensor required the data to have consistent length.
 
-For training, we use Pytorch Lightning, a library that provide us \texttt{LightningModule} to orginize the model and training step logic, and \texttt{Trainer} API for reducing boilerplate training code.
+For training, we use Pytorch Lightning \cite{pytorch-lightning-docs}, a library that provide us \texttt{LightningModule} to orginize the model and training step logic, and \texttt{Trainer} API for reducing boilerplate training code.
 
 
 
@@ -91,7 +91,7 @@ MAX_EPOCHS = 3
 PATIENCE = 10
 \end{lstlisting}
 
-The configs for SBERT is quite similar to BERT, with the main difference being the hidden size, which is 384 instead of 768. We are using the most downloaded SBERT model from Hugging Face, and it's a tiny version, way smaller than BERT.
+The configs for SBERT is quite similar to BERT, with the main difference being the hidden size, which is 384 instead of 768. We are using the most downloaded SBERT model from Hugging Face, and it's a tiny version \cite{allminilm-l6-v2}, way smaller than BERT.
 
 Preparing the dataset differ somewhat to the BERT pipeline. This is because we are inputting 2 sentences seperately instead of combining them like previously.
 
@@ -154,7 +154,7 @@ def mean_pooling(last_hidden_state, attention_mask):
     return (last_hidden_state * mask).sum(1) / mask.sum(1)
 \end{lstlisting}
 
-All that's left is to evaluate the model by taking cosine similarity of the 2 embedding and make prediction. We choose a threshold of 0.7715 for maximum f1-score, based on the official SBERT documentation.
+All that's left is to evaluate the model by taking cosine similarity of the 2 embedding and make prediction. We choose a threshold of 0.7715 for maximum f1-score, based on the official SBERT documentation \cite{sentence-transformers-evaluation}.
 
 \subsubsection{Approach 2: Logistic classifier - training}
 
