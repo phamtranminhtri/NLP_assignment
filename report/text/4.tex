@@ -1,1 +1,187 @@
 \section{Training}
+
+Considering the binary classification task with dataset `Quora Question Pairs', we will carry out experiment with BERT and SBERT to see how well they perform. 
+
+\begin{itemize}
+    \item With BERT, we use the sentence pair approach, which input the 2 sentences into the model at once, then pass the output \texttt{CLS} token through a logistic classifier. We will be training all parameters (BERT + FC layer).
+    \item With SBERT, we use 2 approaches:
+    \begin{enumerate}
+        \item We pass each sentence to the model seperately, get the 2 embedding $u$ and $v$, and use cosine similarity to calculate the score. The result is a scala between $-1$ and 1, thus we will choose a threshold to predict the binary class of the sentence pair. This approach does not train the model.
+        \item We also get 2 embedding $u$ and $v$ like before, but now we concatenate them $(u,v,|u-v|)$ and pass it through a logistic classifier. We will be training all parameters (SBERT + FC layer).
+    \end{enumerate}
+\end{itemize}
+
+The training notebooks was ran on Google Colab. Each notebook ran for about 1-2 hours on T4 free tier GPU (16GB VRAM). The code use PyTorch and PyTorch Lightning for logic.
+
+
+\subsection{BERT}
+
+See \texttt{source/bert/bert.ipynb} notebook for more details.
+
+\begin{lstlisting}[language=python, caption={Configs and hyperparams}]
+DATASET_NAME = "AlekseyKorshuk/quora-question-pairs"
+MODEL_NAME = "google-bert/bert-base-uncased"
+LOG_DIR = "drive/MyDrive/lms/nlp/assignment"
+BATCH_SIZE = 32
+NUM_WORKERS = 2
+D_MODEL = 768
+LEARNING_RATE = 3e-5
+MAX_EPOCHS = 3
+PATIENCE = 10
+\end{lstlisting}
+
+We load the model and dataset from Hugging Face's libraries \texttt{transformers} and \texttt{datasets}. To stay true to the original BERT paper, we will use \texttt{google-bert/bert-base-uncased} (although TinyBERT would be lighter for small GPU). As recommeded by BERT paper, we will choose learning rate $3\times 10^{-5}$.
+
+We clean the invalid data from our dataset, then tokenize them into token ids. These ids will be used as input for the model. It's important to use the correct tokenizer for the model. We also make sure to truncate during tokenization, else it might not fit into BERT's max sequence length.
+
+\begin{lstlisting}[language=python, caption={Preprocess data}]
+ds_cleaned = ds.filter(
+    lambda row: isinstance(row["question1"], str) and isinstance(row["question2"], str)
+)
+ds_tokenized = ds_cleaned.map(
+    lambda row: tokenizer(row["question1"], row["question2"], truncation=True),
+    batched=True,
+    remove_columns=["qid1", "qid2", "question1", "question2"],
+)
+\end{lstlisting}
+
+After that, we split the data to train, validation, and test sets. The final processing step is collating data. We use the available \texttt{DataCollatorWithPadding} to pad each sample to the longest sample of the batch for each mini batch, because pytorch tensor required the data to have consistent length.
+
+For training, we use Pytorch Lightning, a library that provide us \texttt{LightningModule} to orginize the model and training step logic, and \texttt{Trainer} API for reducing boilerplate training code.
+
+
+
+\begin{lstlisting}[language=python, caption={LightningModule model}]
+class BertQuoraModel(L.LightningModule):
+    def __init__(self, bert, d_model=D_MODEL):
+        super().__init__()
+        self.bert = bert
+        self.d_model = d_model
+        self.classifier = nn.Linear(d_model, 1)
+
+    def forward(self, input_ids, attention_mask, token_type_ids):
+        bert_output = self.bert(input_ids, attention_mask, token_type_ids)
+        cls_token = bert_output.pooler_output
+        logits = self.classifier(cls_token).reshape(-1)
+        return logits
+
+    ...
+\end{lstlisting}
+
+BERT input are \texttt{input\_ids} (the position of each token in the vocab), \texttt{attention\_mask} (masking the padding token), \texttt{token\_type\_ids} (0 and 1, for BERT to tell the first and second sentence in the input) 
+
+During training, we log the metrics for comparison after.
+
+
+
+\subsection{SBERT}
+
+See \texttt{source/sbert/sbert.ipynb} notebook for more details.
+
+\begin{lstlisting}[language=python, caption={SBERT config and hyperparams}]
+DATASET_NAME = "AlekseyKorshuk/quora-question-pairs"
+MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+LOG_DIR = "drive/MyDrive/lms/nlp/assignment"
+SEED = 42
+BATCH_SIZE = 32
+NUM_WORKERS = 2
+D_MODEL = 384
+LEARNING_RATE = 3e-5
+MAX_EPOCHS = 3
+PATIENCE = 10
+\end{lstlisting}
+
+The configs for SBERT is quite similar to BERT, with the
+
+Preparing the dataset differ somewhat to the BERT pipeline. This is because we are inputting 2 sentences seperately instead of combining them like previously.
+
+\begin{lstlisting}[language=python, caption={Preprocess data}]
+def tokenize_row(row):
+    output_1 = tokenizer(row["question1"], truncation=True)
+    output_2 = tokenizer(row["question2"], truncation=True)
+    return {
+        "input_ids_1": output_1["input_ids"],
+        "attention_mask_1": output_1["attention_mask"],
+        "input_ids_2": output_2["input_ids"],
+        "attention_mask_2": output_2["attention_mask"],
+    }
+
+
+ds_tokenized = ds_cleaned.map(
+    lambda row: tokenize_row(row),
+    batched=True,
+    remove_columns=["qid1", "qid2", "question1", "question2"],
+)
+\end{lstlisting}
+
+And therefore we need to use a custom data collattor to pad the token ids and masks of each batch correctly
+
+\begin{lstlisting}[language=python, caption={Custom data collator for SBERT}]
+def data_collator(batch):
+    data_dict = {}
+
+    for field in ("input_ids_1", "input_ids_2"):
+        field_data = [torch.tensor(sample[field]) for sample in batch]
+        data_dict[field] = pad_sequence(
+            field_data,
+            batch_first=True,
+            padding_value=tokenizer.pad_token_type_id,
+        )
+
+    for field in ("attention_mask_1", "attention_mask_2"):
+        field_data = [torch.tensor(sample[field]) for sample in batch]
+        data_dict[field] = pad_sequence(
+            field_data,
+            batch_first=True,
+            padding_value=0,
+        )
+
+    data_dict["is_duplicate"] = torch.tensor([sample["is_duplicate"] for sample in batch])
+    return data_dict
+\end{lstlisting}
+
+
+As mentioned above, we use 2 approaches for SBERT, the first without training and the second with training.
+
+
+\subsubsection{Approach 1: Cosine similarity - no training}
+
+We take the mean of the output embedding to get a single embedding, taking into account the different sequence length of each sample in a batch
+
+\begin{lstlisting}[language=python, caption={Mean pooling for SBERT's output}]
+def mean_pooling(last_hidden_state, attention_mask):
+    mask = attention_mask.unsqueeze(-1)
+    return (last_hidden_state * mask).sum(1) / mask.sum(1)
+\end{lstlisting}
+
+All that's left is to evaluate the model by taking cosine similarity of the 2 embedding and make prediction. We choose a threshold of 0.7715 for maximum f1-score, based on the official SBERT documentation.
+
+\subsubsection{Approach 2: Logistic classifier - training}
+
+Similar to how BERT was trained, we also use PyTorch Lightning as the framework to define our training logic. 
+
+
+\begin{lstlisting}[language=python, caption={SBERT LightningModule model}]
+class SbertQuoraModel(L.LightningModule):
+    def __init__(self, sbert, d_model=D_MODEL):
+        super().__init__()
+        self.sbert = sbert
+        self.d_model = d_model
+        self.classifier = nn.Linear(3 * d_model, 1)
+
+    def mean_pooling(self, last_hidden_state, attention_mask):
+        mask = attention_mask.unsqueeze(-1)
+        return (last_hidden_state * mask).sum(1) / mask.sum(1)
+
+    def forward(self, input_ids_1, attention_mask_1, input_ids_2, attention_mask_2):
+        output_1 = self.sbert(input_ids_1, attention_mask_1)
+        output_2 = self.sbert(input_ids_2, attention_mask_2)
+
+        embed_1 = self.mean_pooling(output_1.last_hidden_state, attention_mask_1)
+        embed_2 = self.mean_pooling(output_2.last_hidden_state, attention_mask_2)
+        embed = torch.concat((embed_1, embed_2, torch.abs(embed_1 - embed_2)), dim=1)
+
+        logits = self.classifier(embed).reshape(-1)
+        return logits
+\end{lstlisting}
+

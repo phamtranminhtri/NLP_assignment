@@ -28,56 +28,92 @@ BERT was pre-trained on BooksCorpus (800M words) and English Wikipedia (2500M wo
 For fine-tuning, BERT was trained end-to-end from the pre-trained parameters with the tasks' input and output. At the time it achieved SOTA on 11 tasks:
 
 \begin{itemize}
-    \item {General Language Understanding Evaluation (GLUE):} 
-    \begin{itemize}
-        \item MultiNLI Matched/Mismatched (MNLI-(m/mm))
-        \item \textbf{Quora Question Pairs (QQP)}
-        \item Question NLI (QNLI)
-        \item The Stanford Sentiment Treebank (SST-2)
-        \item The Corpus of Linguistic Acceptability (CoLA)
-        \item Semantic Textual Similarity Benchmark (STS-B)
-        \item Microsoft Research Paraphrase Corpus (MRPC)
-        \item Recognizing Textual Entailment (RTE)
-    \end{itemize}
+    \item {General Language Understanding Evaluation (GLUE):}
+          \begin{itemize}
+              \item MultiNLI Matched/Mismatched (MNLI-(m/mm))
+              \item \textbf{Quora Question Pairs (QQP)}
+              \item Question NLI (QNLI)
+              \item The Stanford Sentiment Treebank (SST-2)
+              \item The Corpus of Linguistic Acceptability (CoLA)
+              \item Semantic Textual Similarity Benchmark (STS-B)
+              \item Microsoft Research Paraphrase Corpus (MRPC)
+              \item Recognizing Textual Entailment (RTE)
+          \end{itemize}
     \item The Stanford Question Answering Dataset (SQuAD)
-    \begin{itemize}
-        \item SQuAD  v1.1
-        \item SQuAD v2.0
-    \end{itemize}
-    \item The Situations With Adversarial Generations (SWAG) 
+          \begin{itemize}
+              \item SQuAD  v1.1
+              \item SQuAD v2.0
+          \end{itemize}
+    \item The Situations With Adversarial Generations (SWAG)
 \end{itemize}
 
 \begin{table}[ht]
-\footnotesize
-\centering
-\label{tab:glue-results}
-\begin{tabular}{lccccccccc}
-\hline
-\textbf{System} &
-\begin{tabular}[c]{@{}c@{}}MNLI-(m/mm)\\392k\end{tabular} &
-\begin{tabular}[c]{@{}c@{}}\textbf{QQP}\\363k\end{tabular} &
-\begin{tabular}[c]{@{}c@{}}QNLI\\108k\end{tabular} &
-\begin{tabular}[c]{@{}c@{}}SST-2\\67k\end{tabular} &
-\begin{tabular}[c]{@{}c@{}}CoLA\\8.5k\end{tabular} &
-\begin{tabular}[c]{@{}c@{}}STS-B\\5.7k\end{tabular} &
-\begin{tabular}[c]{@{}c@{}}MRPC\\3.5k\end{tabular} &
-\begin{tabular}[c]{@{}c@{}}RTE\\2.5k\end{tabular} &
-\begin{tabular}[c]{@{}c@{}}Average\\-\end{tabular} \\
-\hline
-Pre-OpenAI SOTA & 80.6/80.1 & 66.1 & 82.3 & 93.2 & 35.0 & 81.0 & 86.0 & 61.7 & 74.0 \\
-BiLSTM+ELMo+Attn & 76.4/76.1 & 64.8 & 79.8 & 90.4 & 36.0 & 73.3 & 84.9 & 56.8 & 71.0 \\
-OpenAI GPT & 82.1/81.4 & 70.3 & 87.4 & 91.3 & 45.4 & 80.0 & 82.3 & 56.0 & 75.1 \\
-\hline
-BERT$_{\text{BASE}}$ & 84.6/83.4 & \textbf{71.2} & 90.5 & 93.5 & 52.1 & 85.8 & 88.9 & 66.4 & 79.6 \\
-BERT$_{\text{LARGE}}$ & {86.7/85.9} & {72.1} & {92.7} &
-{94.9} & {60.5} & {86.5} &
-{89.3} & {70.1} & {82.1} \\
-\hline
-\end{tabular}
-\caption{GLUE results}
+    \footnotesize
+    \centering
+    \label{tab:glue-results}
+    \begin{tabular}{lccccccccc}
+        \hline
+        \textbf{System}                                            &
+        \begin{tabular}[c]{@{}c@{}}MNLI-(m/mm)\\392k\end{tabular}  &
+        \begin{tabular}[c]{@{}c@{}}\textbf{QQP}\\363k\end{tabular} &
+        \begin{tabular}[c]{@{}c@{}}QNLI\\108k\end{tabular}         &
+        \begin{tabular}[c]{@{}c@{}}SST-2\\67k\end{tabular}         &
+        \begin{tabular}[c]{@{}c@{}}CoLA\\8.5k\end{tabular}         &
+        \begin{tabular}[c]{@{}c@{}}STS-B\\5.7k\end{tabular}        &
+        \begin{tabular}[c]{@{}c@{}}MRPC\\3.5k\end{tabular}         &
+        \begin{tabular}[c]{@{}c@{}}RTE\\2.5k\end{tabular}          &
+        \begin{tabular}[c]{@{}c@{}}Average\\-\end{tabular}                                                                                          \\
+        \hline
+        Pre-OpenAI SOTA                                            & 80.6/80.1   & 66.1          & 82.3   & 93.2 & 35.0 & 81.0 & 86.0 & 61.7 & 74.0 \\
+        BiLSTM+ELMo+Attn                                           & 76.4/76.1   & 64.8          & 79.8   & 90.4 & 36.0 & 73.3 & 84.9 & 56.8 & 71.0 \\
+        OpenAI GPT                                                 & 82.1/81.4   & 70.3          & 87.4   & 91.3 & 45.4 & 80.0 & 82.3 & 56.0 & 75.1 \\
+        \hline
+        BERT$_{\text{BASE}}$                                       & 84.6/83.4   & \textbf{71.2} & 90.5   & 93.5 & 52.1 & 85.8 & 88.9 & 66.4 & 79.6 \\
+        BERT$_{\text{LARGE}}$                                      & {86.7/85.9} & {72.1}        & {92.7} &
+        {94.9}                                                     & {60.5}      & {86.5}        &
+        {89.3}                                                     & {70.1}      & {82.1}                                                           \\
+        \hline
+    \end{tabular}
+    \caption{GLUE results}
 \end{table}
 
-Here we focus on QQR, as this will be the dataset we are working with in this project.
+Here we focus on QQR, as this will be the dataset we are working with in this project. The F1 score for QQP of BERT BASE from the paper table was 71.2
 
 
 \subsection{SBERT}
+
+BERT is a powerful model for multiple downstream task. But  when it come to semantic textual similarity, specifically finding similarity between 2 sentences, it require feeding both sentences into the network pairwise. Which mean, given $n$ sentences, we need to calculate $\frac{n(n-1)}{2}$ combination of sentence pair to get the similarity between each pair, which is inefficient. Another method is to get embedding of each sentence individually, to compute the similarity between the embedding vectors. It's common to use the last hidden state to represent the sentence, such as the \texttt{CLS} token, or the average pool of the embeddings.
+SBERT paper argues that this approad yeild worse embedding result than other existing approachs, like GLoVe.
+
+SBERT (Sentence-BERT) was introduced in the paper ``Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks'' by Nils Reimers et al in 2019. SBERT addressed the mentioned issues by taking BERT and training it on their specific task suitable for encoding the sentence for sementic similarity and clustering tasks.
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.3\linewidth]{image/sbert_eval.png}
+    \caption{SBERT inference}
+    \label{fig:sbert_eval}
+\end{figure}
+
+SBERT add a pooling layer to the output of BERT, with many availble config (\texttt{CLS}, \texttt{MEAN}, \texttt{MAX}), thought the default is \texttt{MEAN}, and use cosine similarity as the default similarity function.
+
+SBERT used the following objective function:
+
+\begin{itemize}
+    \item \textbf{Classification:} With 2 sentence embedding $u$ and $v$:
+          \[
+              o = \mathrm{softmax}\!\left(W_t(\text{concat}(u, v, |u - v|))\right)
+          \]
+          we then use cross entropy loss
+    \item \textbf{Regression:} Compute the cosine similarity between 2 embedding, then use mean square error loss
+    \item \textbf{Triplet:} Given an anchor
+          sentence $a$, a positive sentence $p$, and a negative
+          sentence $n$, we pull $p$ closer to and $n$ further away from $a$.
+          \[
+          \max\left(\lVert s_a - s_p \rVert - \lVert s_a - s_n \rVert + \epsilon,\; 0\right)
+          \]
+
+\end{itemize}
+
+
+SBERT was trained on SNLI and  Multi-Genre NLI datasets with Adam optimizer and linear learning rate warm-up. It achived remarkable results on multiple benchmark. The best selling point for SBERT is its efficency in encoding sentences with same trade off for accuracy.
+
