@@ -17,6 +17,7 @@ Due to some conflict in displaying the notebooks, it's best to view `source/bert
 * **BERT:** <a target="_blank" href="https://colab.research.google.com/github/phamtranminhtri/NLP_assignment/blob/main/source/bert/bert.ipynb">
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a>
+
 * **SBERT:** <a target="_blank" href="https://colab.research.google.com/github/phamtranminhtri/NLP_assignment/blob/main/source/sbert/sbert.ipynb">
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a>
